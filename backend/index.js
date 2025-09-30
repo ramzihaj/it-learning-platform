@@ -1,14 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const authRoutes = require('./routes/auth');
+const branchRoutes = require('./routes/branches');
 require('dotenv').config();
 
 const app = express();
 const port = 5000;
 
+// Middleware
+app.use(cors());
 app.use(express.json());
-app.use('/api/auth', authRoutes); // Mount auth routes
 
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/branches', branchRoutes);
+
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -16,6 +24,7 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log('Connecté à MongoDB'))
   .catch(err => console.error('Erreur MongoDB:', err));
 
+// Test endpoint
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Serveur MERN fonctionne !' });
 });
