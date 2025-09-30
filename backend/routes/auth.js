@@ -33,23 +33,16 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ error: 'Email ou mot de passe incorrect' });
+      return res.status(400).json({ error: 'Utilisateur non trouvé' });
     }
-
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: 'Email ou mot de passe incorrect' });
+      return res.status(400).json({ error: 'Mot de passe incorrect' });
     }
-
-    // Generate JWT
-   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.json({ token, user: { id: user._id, email: user.email, name: user.name } });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token, userId: user._id, message: 'Connexion réussie' });
   } catch (error) {
     res.status(500).json({ error: 'Erreur serveur' });
   }

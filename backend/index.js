@@ -12,9 +12,14 @@ const port = 5000;
 app.use(cors());
 app.use(express.json());
 
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/branches', branchRoutes);
+const courseRoutes = require('./routes/courses');
+app.use('/api/courses', courseRoutes);
+const progressRoutes = require('./routes/progress');
+app.use('/api/progress', progressRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
