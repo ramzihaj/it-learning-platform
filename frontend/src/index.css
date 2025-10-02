@@ -1,6 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'); /* En haut pour PostCSS */
 @import "tailwindcss";
-/* Import Google Fonts (Inter pour style pro homogène) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 body {
   font-family: 'Inter', sans-serif;
@@ -8,7 +7,7 @@ body {
 
 /* Styles pro personnalisés (homogènes) */
 .pro-card {
-  transition: all 0.2s ease-in-out; /* Smooth homogène */
+  transition: all 0.2s ease-in-out;
 }
 
 .pro-card:hover {
@@ -105,7 +104,7 @@ body {
   box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.25);
 }
 
-/* Dark Mode Homogène (Texte clair sur fond sombre, sans duplicates) */
+/* Dark Mode Homogène (texte clair sur fond sombre) */
 .dark .text-gray-600 {
   color: #d1d5db !important; /* Gray-300 clair */
 }
