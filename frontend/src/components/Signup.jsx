@@ -25,44 +25,44 @@ function Signup() {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Inscription</h2>
+    <div className="p-4 max-w-md mx-auto bg-white dark:bg-gray-800 rounded shadow">
+      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Inscription</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700">Nom :</label>
+          <label className="block text-gray-700 dark:text-gray-300">Nom :</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             required
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700">Email :</label>
+          <label className="block text-gray-700 dark:text-gray-300">Email :</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             required
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700">Mot de passe :</label>
+          <label className="block text-gray-700 dark:text-gray-300">Mot de passe :</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             required
           />
         </div>
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-          S’inscrire
+        <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white p-2 rounded hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-400 dark:hover:to-purple-400 transition-all duration-300">
+          Commencez Maintenant {/* Changé ici */}
         </button>
       </form>
-      {message && <p className={`mt-4 ${message.includes('succès') ? 'text-green-500' : 'text-red-500'}`}>{message}</p>}
+      {message && <p className={`mt-4 ${message.includes('succès') ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>{message}</p>}
     </div>
   );
 }

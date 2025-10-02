@@ -25,6 +25,7 @@ router.post('/register', async (req, res) => {
 
     res.status(201).json({ message: 'Utilisateur créé avec succès' });
   } catch (error) {
+    console.error('Erreur register:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
@@ -33,7 +34,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('email name selectedBranch _id password'); // Optimisation
     if (!user) {
       return res.status(400).json({ error: 'Utilisateur non trouvé' });
     }
@@ -44,6 +45,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token, userId: user._id, message: 'Connexion réussie' });
   } catch (error) {
+    console.error('Erreur login:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });

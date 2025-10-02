@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
     const branches = await Branch.find();
     res.json(branches);
   } catch (error) {
+    console.error('Erreur get branches:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
 router.post('/select', authMiddleware, async (req, res) => {
   try {
     const { branchId } = req.body;
-    const userId = req.user.userId; // From JWT
+    const userId = req.user.id; // Corrigé : req.user.id (du JWT { id: ... })
 
     const branch = await Branch.findById(branchId);
     if (!branch) {
@@ -30,8 +31,12 @@ router.post('/select', authMiddleware, async (req, res) => {
       { selectedBranch: branch.name },
       { new: true }
     );
+    if (!user) { // Ajouté pour sécurité
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
     res.json({ message: 'Branche sélectionnée', user });
   } catch (error) {
+    console.error('Erreur select branch:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });

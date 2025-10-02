@@ -6,6 +6,8 @@ const branches = [
   { name: 'Web', description: 'Développement web (HTML, CSS, JS, React)' },
   { name: 'IA', description: 'Intelligence artificielle et machine learning' },
   { name: 'DevOps', description: 'Automatisation et gestion d’infrastructures' },
+  { name: 'Cybersecurity', description: 'Sécurité informatique et protection des données' }, // Nouvelle
+  { name: 'Data Science', description: 'Analyse de données et visualisation' }, // Nouvelle
 ];
 
 mongoose.connect(process.env.MONGO_URI, {
