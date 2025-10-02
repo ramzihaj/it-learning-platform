@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function BranchSelection() {
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/branches')
@@ -26,6 +28,8 @@ function BranchSelection() {
       );
       setMessage(response.data.message);
       setSelectedBranch(response.data.user.selectedBranch);
+      localStorage.setItem('selectedBranch', response.data.user.selectedBranch); // Store branch
+      setTimeout(() => navigate('/courses'), 1000); // Redirect to courses
     } catch (error) {
       setMessage(error.response?.data.error || 'Erreur lors de la sélection');
     }

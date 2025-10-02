@@ -16,8 +16,9 @@ function Login() {
         password,
       });
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userId', response.data.userId); // Store userId
       setMessage('Connexion réussie !');
-      setTimeout(() => navigate('/branches'), 1000);
+      setTimeout(() => navigate('/dashboard'), 1000); // Redirect vers /dashboard
     } catch (error) {
       setMessage(error.response?.data.error || 'Erreur lors de la connexion');
     }
