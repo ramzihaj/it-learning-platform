@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState } from 'react';
-import { HomeIcon, Bars3Icon, XMarkIcon, ChartBarIcon, BookOpenIcon, UserGroupIcon, ClipboardDocumentCheckIcon, ArrowRightOnRectangleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'; // Ajout MagnifyingGlassIcon pour search
+import { HomeIcon, Bars3Icon, XMarkIcon, ChartBarIcon, BookOpenIcon, UserGroupIcon, ClipboardDocumentCheckIcon, ArrowRightOnRectangleIcon, MagnifyingGlassIcon, UserIcon } from '@heroicons/react/24/outline'; // Ajout UserIcon pour Profil
 import Signup from './components/Signup';
 import Login from './components/Login';
 import BranchSelection from './components/BranchSelection';
@@ -9,6 +9,7 @@ import Progress from './components/Progress';
 import Dashboard from './components/Dashboard';
 import Home from './components/Home';
 import Footer from './components/Footer';
+import Profile from './components/Profile';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -16,7 +17,6 @@ function App() {
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  // Passez searchQuery aux composants enfants via props ou context si besoin
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex">
@@ -51,6 +51,10 @@ function App() {
             <Link to="/progress" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-300 hover:scale-105" onClick={toggleSidebar}>
               <ClipboardDocumentCheckIcon className="h-5 w-5" />
               <span>Progrès</span>
+            </Link>
+            <Link to="/profile" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-300 hover:scale-105" onClick={toggleSidebar}>
+              <UserIcon className="h-5 w-5" />
+              <span>Profil</span>
             </Link>
             <Link to="/login" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-300 hover:scale-105" onClick={toggleSidebar}>
               <ArrowRightOnRectangleIcon className="h-5 w-5" />
@@ -89,13 +93,14 @@ function App() {
               </div>
             </div>
             <Routes>
-              <Route path="/" element={<Home searchQuery={searchQuery} />} /> {/* Passez searchQuery si besoin */}
+              <Route path="/" element={<Home searchQuery={searchQuery} />} />
               <Route path="/dashboard" element={<Dashboard searchQuery={searchQuery} />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
               <Route path="/branches" element={<BranchSelection searchQuery={searchQuery} />} />
               <Route path="/courses" element={<CourseList searchQuery={searchQuery} />} />
               <Route path="/progress" element={<Progress searchQuery={searchQuery} />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </div>
           <Footer />

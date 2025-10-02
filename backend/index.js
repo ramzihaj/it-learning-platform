@@ -1,32 +1,34 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const authRoutes = require('./routes/auth');
-const branchRoutes = require('./routes/branches');
-const courseRoutes = require('./routes/courses'); // Ajouté la déclaration
-const progressRoutes = require('./routes/progress');
-const summaryRoutes = require('./routes/summary');
 require('dotenv').config();
 
+// Créez app EN PREMIER (fix l'erreur initialization)
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
-// Middleware
+// Middleware (après app)
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Require routes APRÈS app (fix l'ordre)
+const authRoutes = require('./routes/auth');
+const branchRoutes = require('./routes/branches');
+const courseRoutes = require('./routes/courses');
+const progressRoutes = require('./routes/progress');
+const summaryRoutes = require('./routes/summary');
+const profileRoutes = require('./routes/profile'); // Ajouté ici
+
+// Routes (après requires)
 app.use('/api/auth', authRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/summary', summaryRoutes);
+app.use('/api/profile', profileRoutes); // Ligne 11 maintenant OK
 
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+// MongoDB connection (sans options dépréciées)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connecté à MongoDB'))
   .catch(err => console.error('Erreur MongoDB:', err));
 
