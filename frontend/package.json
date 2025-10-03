@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@stripe/stripe-js": "^8.0.0",
     "@tailwindcss/vite": "^4.1.13",
     "@tremor/react": "^3.18.7",
     "autoprefixer": "^10.4.21",
