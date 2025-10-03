@@ -18,7 +18,7 @@ const courseRoutes = require('./routes/courses');
 const progressRoutes = require('./routes/progress');
 const summaryRoutes = require('./routes/summary');
 const profileRoutes = require('./routes/profile'); // Ajouté ici
-
+const paymentRoutes = require('./routes/payment');
 // Routes (après requires)
 app.use('/api/auth', authRoutes);
 app.use('/api/branches', branchRoutes);
@@ -26,7 +26,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/summary', summaryRoutes);
 app.use('/api/profile', profileRoutes); // Ligne 11 maintenant OK
-
+app.use('/api/payment', paymentRoutes);
 // MongoDB connection (sans options dépréciées)
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connecté à MongoDB'))
