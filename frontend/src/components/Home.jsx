@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRightIcon, SparklesIcon, StarIcon, UserGroupIcon, AcademicCapIcon, PlayIcon, ChartBarIcon, CodeBracketIcon, CogIcon } from '@heroicons/react/24/outline'; // Corrigé : Ajout ChartBarIcon, CodeBracketIcon, CogIcon
+import { ArrowRightIcon, SparklesIcon, StarIcon, UserGroupIcon, AcademicCapIcon, PlayIcon, ChartBarIcon, CodeBracketIcon, CogIcon } from '@heroicons/react/24/outline';
 
-function Home() {
+function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
   const navigate = useNavigate();
 
   // Données statiques inspirées Udemy/Coursera
@@ -27,6 +27,15 @@ function Home() {
     { name: 'Abdullahi M.', quote: 'De zéro à expert en 3 mois. Les vidéos YouTube et le tracking de progrès sont parfaits.', rating: 4.9 },
   ];
 
+  // Filtrage searchQuery
+  const filteredFeatured = featuredCourses.filter(c => 
+    c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.branch.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const filteredCategories = categories.filter(cat => 
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Composant Modulaire : Hero Section
   const HeroSection = () => (
     <section className="relative overflow-hidden py-20">
@@ -49,13 +58,13 @@ function Home() {
     </section>
   );
 
-  // Composant Modulaire : Featured Courses
+  // Composant Modulaire : Featured Courses (Filtré)
   const FeaturedCourses = () => (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 animate-fadeInUp">Cours Populaires</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 animate-fadeInUp">Cours Populaires {searchQuery ? `pour "${searchQuery}"` : ''}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredCourses.map((course, index) => (
+          {filteredFeatured.length > 0 ? filteredFeatured.map((course, index) => (
             <Link key={index} to="/courses" className="group">
               <div className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-200 dark:border-gray-600">
                 <div className="relative h-32 overflow-hidden">
@@ -83,19 +92,21 @@ function Home() {
                 </div>
               </div>
             </Link>
-          ))}
+          )) : (
+            <p className="col-span-full text-center text-gray-500 dark:text-gray-400">Aucun cours trouvé pour "{searchQuery}".</p>
+          )}
         </div>
       </div>
     </section>
   );
 
-  // Composant Modulaire : Catégories
+  // Composant Modulaire : Catégories (Filtré)
   const Categories = () => (
     <section className="py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 animate-fadeInUp">Découvrez Nos Catégories</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 animate-fadeInUp">Découvrez Nos Catégories {searchQuery ? `pour "${searchQuery}"` : ''}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {categories.map((cat, index) => (
+          {filteredCategories.length > 0 ? filteredCategories.map((cat, index) => (
             <Link key={index} to="/branches" className="group">
               <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center">
                 <div className={`w-12 h-12 ${cat.color}-100 dark:${cat.color}-900 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform`}>
@@ -105,7 +116,9 @@ function Home() {
                 <p className="text-sm text-gray-600 dark:text-gray-300">+20 cours</p>
               </div>
             </Link>
-          ))}
+          )) : (
+            <p className="col-span-full text-center text-gray-500 dark:text-gray-400">Aucune catégorie trouvée pour "{searchQuery}".</p>
+          )}
         </div>
       </div>
     </section>

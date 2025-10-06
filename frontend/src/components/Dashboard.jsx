@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { UserIcon, ChartBarIcon, BookOpenIcon, ShieldCheckIcon, AcademicCapIcon, CodeBracketIcon, SparklesIcon, CogIcon } from '@heroicons/react/24/outline'; // Icons pro + thématiques
+import { useNavigate, Link } from 'react-router-dom';
+import { UserIcon, ChartBarIcon, BookOpenIcon, ShieldCheckIcon, AcademicCapIcon, CodeBracketIcon, SparklesIcon, CogIcon } from '@heroicons/react/24/outline';
 
-function Dashboard() {
+function Dashboard({ searchQuery = '' }) {  // Props searchQuery pour filtrage branches
   const [userStats, setUserStats] = useState({ name: '', selectedBranch: '', completedCourses: 0, totalCourses: 0, quizScore: 0 });
-  const [branches, setBranches] = useState([]); // Pour recommandations
+  const [branches, setBranches] = useState([]);
   const [message, setMessage] = useState('');
+  const [userRole, setUserRole] = useState('');  // Pour lien admin
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,29 +24,36 @@ function Dashboard() {
         const userId = localStorage.getItem('userId');
         const branch = localStorage.getItem('selectedBranch') || 'Web';
 
-        const [progressRes, coursesRes, branchesRes] = await Promise.all([
+        const [profileRes, progressRes, coursesRes, branchesRes] = await Promise.all([
+          axios.get('http://localhost:5000/api/profile', { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`http://localhost:5000/api/progress/${userId}`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`http://localhost:5000/api/courses/${branch}`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get('http://localhost:5000/api/branches', { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         const completed = progressRes.data.filter(p => p.completed).length;
-        const quizScore = Math.round(Math.random() * 100); // Simulé ; intégrez vrai score
+        const quizScore = Math.round(Math.random() * 100); // À remplacer par vrai score
 
         setUserStats({
-          name: 'Test User', // Récupérez de login
+          name: profileRes.data.user.name,  // Nom réel du backend
           selectedBranch: branch,
           completedCourses: completed,
           totalCourses: coursesRes.data.length,
           quizScore,
         });
-        setBranches(branchesRes.data);
+        setUserRole(profileRes.data.user.role);  // Rôle pour admin
+        // Filtrage searchQuery sur branches
+        const filteredBranches = branchesRes.data.filter(b => 
+          b.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          b.description.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setBranches(filteredBranches);
       } catch (error) {
         setMessage(error.response?.data.error || 'Erreur chargement dashboard');
       }
     };
     fetchDashboard();
-  }, [navigate]);
+  }, [navigate, searchQuery]);  // Dépend de searchQuery
 
   // Données chart modulaire
   const chartData = [
@@ -65,43 +73,43 @@ function Dashboard() {
         return { 
           icon: <CodeBracketIcon className="h-12 w-12" />, 
           color: 'blue', 
-          image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' // Laptop coding
+          image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'ia':
         return { 
           icon: <SparklesIcon className="h-12 w-12" />, 
           color: 'purple', 
-          image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' // AI brain
+          image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'devops':
         return { 
           icon: <CogIcon className="h-12 w-12" />, 
           color: 'green', 
-          image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' // Gears DevOps
+          image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'cybersecurity':
         return { 
           icon: <ShieldCheckIcon className="h-12 w-12" />, 
           color: 'red', 
-          image: 'https://www.itweb.co.za/static/pictures/2024/06/cyber-security-network-Jun-2024.jpg' // Lock security
+          image: 'https://images.unsplash.com/photo-1632221326803-5f0d0a0ef706?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'data science':
         return { 
           icon: <ChartBarIcon className="h-12 w-12" />, 
           color: 'indigo', 
-          image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' // Data charts
+          image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       default:
         return { 
           icon: <AcademicCapIcon className="h-12 w-12" />, 
           color: 'gray', 
-          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' // Default
+          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
     }
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg"> {/* Plus large pour grid */}
+    <div className="p-6 max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Dashboard - Bienvenue, {userStats.name} !</h1>
       {message && <p className={`mb-4 p-3 rounded-lg ${message.includes('Erreur') ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300' : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'}`}>{message}</p>}
 
@@ -125,6 +133,13 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* Lien Admin Conditionnel */}
+      {userRole === 'admin' && (
+        <div className="mb-6 p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+          <Link to="/admin" className="text-yellow-700 dark:text-yellow-300 font-semibold hover:underline">→ Accéder au Dashboard Admin</Link>
+        </div>
+      )}
+
       {/* Section Chart Modulaire (Recharts Attractif) */}
       <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900 dark:to-purple-900 p-6 rounded-xl shadow-md border border-indigo-200 dark:border-indigo-700 mb-8">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Progrès par Branche</h3>
@@ -140,11 +155,11 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Section Branches Recommandées (Cards avec Images Attractives) */}
+      {/* Section Branches Recommandées (Cards avec Images Attractives, Filtrées) */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-600">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Branches Recommandées</h3>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Branches Recommandées {searchQuery ? `pour "${searchQuery}"` : ''}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {branches.map(branch => {
+          {branches.length > 0 ? branches.map(branch => {
             const { icon, color, image } = getBranchData(branch.name);
             return (
               <div
@@ -152,7 +167,6 @@ function Dashboard() {
                 className={`relative overflow-hidden bg-gradient-to-br from-${color}-50 to-${color}-100 dark:from-${color}-900 dark:to-${color}-800 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 cursor-pointer border border-${color}-200 dark:border-${color}-700 group`}
                 onClick={() => navigate('/branches')}
               >
-                {/* Image Attractif en Haut */}
                 <div className="relative h-32 overflow-hidden">
                   <img 
                     src={image} 
@@ -170,7 +184,9 @@ function Dashboard() {
                 </div>
               </div>
             );
-          })}
+          }) : (
+            <p className="col-span-full text-center text-gray-500 dark:text-gray-400">Aucun résultat pour "{searchQuery}". Essayez un autre terme.</p>
+          )}
         </div>
       </div>
     </div>

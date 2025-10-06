@@ -19,7 +19,10 @@ const progressRoutes = require('./routes/progress');
 const summaryRoutes = require('./routes/summary');
 const profileRoutes = require('./routes/profile'); // Ajouté ici
 const paymentRoutes = require('./routes/payment');
-// Routes (après requires)
+const adminRoutes = require('./routes/admin');
+
+// Après les autres app.use
+app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/courses', courseRoutes);

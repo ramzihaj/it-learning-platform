@@ -22,3 +22,11 @@ mongoose.connect(process.env.MONGO_URI, {
     mongoose.connection.close();
   })
   .catch(err => console.error('Erreur:', err));
+  const adminUser = new User({
+  name: 'Admin Test',
+  email: 'admin@example.com',
+  password: 'admin123', // Sera hashé
+  role: 'admin'
+});
+await adminUser.save();
+console.log('Admin créé');

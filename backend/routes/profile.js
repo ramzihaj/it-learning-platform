@@ -4,14 +4,15 @@ const User = require('../models/User');
 const Progress = require('../models/Progress');
 const Course = require('../models/Course');
 const auth = require('../middleware/auth');
-const { jsPDF } = require('jspdf'); // Destructuring au TOP (fix initialization)
+const { jsPDF } = require('jspdf');
 require('dotenv').config();
 
 // Get user profile
 router.get('/', auth, async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await User.findById(userId).select('-password');
+    // ✅ Fix : Inclusion seulement (exclut password par défaut, inclut role)
+    const user = await User.findById(userId).select('name email selectedBranch role');  // Pas de '-password' mixé
     const progress = await Progress.find({ userId }).populate('courseId', 'title branch');
     const completedBranches = [...new Set(progress.filter(p => p.completed && p.courseId?.branch).map(p => p.courseId.branch))].length;
     res.json({ user, progress, stats: { completedBranches, totalCourses: progress.length } });
@@ -26,7 +27,8 @@ router.put('/', auth, async (req, res) => {
   try {
     const { name, email } = req.body;
     const userId = req.user.id;
-    const user = await User.findByIdAndUpdate(userId, { name, email }, { new: true }).select('-password');
+    // ✅ Même fix pour update
+    const user = await User.findByIdAndUpdate(userId, { name, email }, { new: true }).select('name email selectedBranch role');
     res.json({ message: 'Profil mis à jour', user });
   } catch (error) {
     console.error('Erreur update profile:', error);
@@ -38,6 +40,7 @@ router.put('/', auth, async (req, res) => {
 router.post('/certificate', auth, async (req, res) => {
   try {
     const userId = req.user.id;
+    // ✅ Fix : Inclusion seulement
     const user = await User.findById(userId).select('name selectedBranch');
     const progress = await Progress.find({ userId }).populate('courseId');
     const completedCount = progress.filter(p => p.completed).length;
@@ -46,7 +49,7 @@ router.post('/certificate', auth, async (req, res) => {
       return res.status(400).json({ error: 'Complétez au moins 5 cours pour un certificat' });
     }
 
-    const doc = new jsPDF(); // Utilise top-level destructuring (fix initialization)
+    const doc = new jsPDF();
 
     // Header : Badge "INFORMATION TECHNOLOGY SPECIALIST" avec étoiles (exactement comme exemple)
     doc.setFillColor(0, 51, 102); // Bleu foncé

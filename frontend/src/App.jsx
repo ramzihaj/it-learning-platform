@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { useState } from 'react';
-import { HomeIcon, Bars3Icon, XMarkIcon, ChartBarIcon, BookOpenIcon, UserGroupIcon, ClipboardDocumentCheckIcon, ArrowRightOnRectangleIcon, MagnifyingGlassIcon, UserIcon } from '@heroicons/react/24/outline'; // Ajout UserIcon pour Profil
+import { useState, useEffect } from 'react';  // Ajout useEffect
+import axios from 'axios';
+import { HomeIcon, Bars3Icon, XMarkIcon, ChartBarIcon, BookOpenIcon, UserGroupIcon, ClipboardDocumentCheckIcon, ArrowRightOnRectangleIcon, MagnifyingGlassIcon, UserIcon, CogIcon } from '@heroicons/react/24/outline'; // Ajout CogIcon
 import Signup from './components/Signup';
 import Login from './components/Login';
 import BranchSelection from './components/BranchSelection';
@@ -10,17 +11,29 @@ import Dashboard from './components/Dashboard';
 import Home from './components/Home';
 import Footer from './components/Footer';
 import Profile from './components/Profile';
+import AdminDashboard from './components/AdminDashboard';  // Nouveau import
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // État global pour recherche
+  const [searchQuery, setSearchQuery] = useState('');
+  const [userRole, setUserRole] = useState('');  // État pour rôle admin
+
+  // Fetch rôle au load (si connecté)
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.get('http://localhost:5000/api/profile', { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => setUserRole(res.data.user.role))
+        .catch(() => setUserRole(''));
+    }
+  }, []);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex">
-        {/* Sidebar (inchangée) */}
+        {/* Sidebar */}
         <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-blue-600 to-indigo-700 text-white transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <div className="p-4 flex justify-between items-center border-b border-blue-800">
             <div className="flex items-center space-x-2">
@@ -56,6 +69,13 @@ function App() {
               <UserIcon className="h-5 w-5" />
               <span>Profil</span>
             </Link>
+            {/* Lien Admin Conditionnel */}
+            {userRole === 'admin' && (
+              <Link to="/admin" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-300 hover:scale-105" onClick={toggleSidebar}>
+                <CogIcon className="h-5 w-5" />
+                <span>Admin</span>
+              </Link>
+            )}
             <Link to="/login" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-300 hover:scale-105" onClick={toggleSidebar}>
               <ArrowRightOnRectangleIcon className="h-5 w-5" />
               <span>Connexion</span>
@@ -79,7 +99,7 @@ function App() {
         {/* Contenu Principal avec Barre de Recherche Globale */}
         <div className="flex-1 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-4 py-6">
-            {/* Barre de Recherche Globale (Comme Udemy/Coursera) */}
+            {/* Barre de Recherche Globale */}
             <div className="mb-6">
               <div className="relative">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -101,6 +121,7 @@ function App() {
               <Route path="/courses" element={<CourseList searchQuery={searchQuery} />} />
               <Route path="/progress" element={<Progress searchQuery={searchQuery} />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/admin" element={<AdminDashboard />} />  {/* Nouvelle route */}
             </Routes>
           </div>
           <Footer />
