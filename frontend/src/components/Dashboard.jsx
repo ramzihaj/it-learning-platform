@@ -4,11 +4,11 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserIcon, ChartBarIcon, BookOpenIcon, ShieldCheckIcon, AcademicCapIcon, CodeBracketIcon, SparklesIcon, CogIcon } from '@heroicons/react/24/outline';
 
-function Dashboard({ searchQuery = '' }) {  // Props searchQuery pour filtrage branches
+function Dashboard({ searchQuery = '' }) {
   const [userStats, setUserStats] = useState({ name: '', selectedBranch: '', completedCourses: 0, totalCourses: 0, quizScore: 0 });
   const [branches, setBranches] = useState([]);
   const [message, setMessage] = useState('');
-  const [userRole, setUserRole] = useState('');  // Pour lien admin
+  const [userRole, setUserRole] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,17 +32,16 @@ function Dashboard({ searchQuery = '' }) {  // Props searchQuery pour filtrage b
         ]);
 
         const completed = progressRes.data.filter(p => p.completed).length;
-        const quizScore = Math.round(Math.random() * 100); // À remplacer par vrai score
+        const quizScore = Math.round(Math.random() * 100);
 
         setUserStats({
-          name: profileRes.data.user.name,  // Nom réel du backend
+          name: profileRes.data.user.name,
           selectedBranch: branch,
           completedCourses: completed,
           totalCourses: coursesRes.data.length,
           quizScore,
         });
-        setUserRole(profileRes.data.user.role);  // Rôle pour admin
-        // Filtrage searchQuery sur branches
+        setUserRole(profileRes.data.user.role);
         const filteredBranches = branchesRes.data.filter(b => 
           b.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
           b.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -53,9 +52,8 @@ function Dashboard({ searchQuery = '' }) {  // Props searchQuery pour filtrage b
       }
     };
     fetchDashboard();
-  }, [navigate, searchQuery]);  // Dépend de searchQuery
+  }, [navigate, searchQuery]);
 
-  // Données chart modulaire
   const chartData = [
     { branche: 'Web', completed: userStats.completedCourses },
     { branche: 'IA', completed: 3 },
@@ -66,45 +64,20 @@ function Dashboard({ searchQuery = '' }) {  // Props searchQuery pour filtrage b
 
   const progressPercentage = userStats.totalCourses > 0 ? ((userStats.completedCourses / userStats.totalCourses) * 100).toFixed(1) : 0;
 
-  // Données par branche pour images/icons (attractifs)
   const getBranchData = (name) => {
     switch (name.toLowerCase()) {
       case 'web':
-        return { 
-          icon: <CodeBracketIcon className="h-12 w-12" />, 
-          color: 'blue', 
-          image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
+        return { icon: <CodeBracketIcon className="h-12 w-12" />, color: 'blue', image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' };
       case 'ia':
-        return { 
-          icon: <SparklesIcon className="h-12 w-12" />, 
-          color: 'purple', 
-          image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
+        return { icon: <SparklesIcon className="h-12 w-12" />, color: 'purple', image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' };
       case 'devops':
-        return { 
-          icon: <CogIcon className="h-12 w-12" />, 
-          color: 'green', 
-          image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
+        return { icon: <CogIcon className="h-12 w-12" />, color: 'green', image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' };
       case 'cybersecurity':
-        return { 
-          icon: <ShieldCheckIcon className="h-12 w-12" />, 
-          color: 'red', 
-          image: 'https://images.unsplash.com/photo-1632221326803-5f0d0a0ef706?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
+        return { icon: <ShieldCheckIcon className="h-12 w-12" />, color: 'red', image: 'https://images.unsplash.com/photo-1632221326803-5f0d0a0ef706?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' };
       case 'data science':
-        return { 
-          icon: <ChartBarIcon className="h-12 w-12" />, 
-          color: 'indigo', 
-          image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
+        return { icon: <ChartBarIcon className="h-12 w-12" />, color: 'indigo', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' };
       default:
-        return { 
-          icon: <AcademicCapIcon className="h-12 w-12" />, 
-          color: 'gray', 
-          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
+        return { icon: <AcademicCapIcon className="h-12 w-12" />, color: 'gray', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' };
     }
   };
 
@@ -113,7 +86,7 @@ function Dashboard({ searchQuery = '' }) {  // Props searchQuery pour filtrage b
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Dashboard - Bienvenue, {userStats.name} !</h1>
       {message && <p className={`mb-4 p-3 rounded-lg ${message.includes('Erreur') ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300' : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'}`}>{message}</p>}
 
-      {/* Section Stats Modulaire (Cards Attractives) */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 p-6 rounded-xl shadow-md border border-blue-200 dark:border-blue-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
           <UserIcon className="h-8 w-8 text-blue-500 dark:text-blue-400 mb-2" />
@@ -133,14 +106,14 @@ function Dashboard({ searchQuery = '' }) {  // Props searchQuery pour filtrage b
         </div>
       </div>
 
-      {/* Lien Admin Conditionnel */}
+      {/* Lien Admin */}
       {userRole === 'admin' && (
         <div className="mb-6 p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
           <Link to="/admin" className="text-yellow-700 dark:text-yellow-300 font-semibold hover:underline">→ Accéder au Dashboard Admin</Link>
         </div>
       )}
 
-      {/* Section Chart Modulaire (Recharts Attractif) */}
+      {/* Chart Progrès */}
       <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900 dark:to-purple-900 p-6 rounded-xl shadow-md border border-indigo-200 dark:border-indigo-700 mb-8">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Progrès par Branche</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -155,7 +128,7 @@ function Dashboard({ searchQuery = '' }) {  // Props searchQuery pour filtrage b
         </ResponsiveContainer>
       </div>
 
-      {/* Section Branches Recommandées (Cards avec Images Attractives, Filtrées) */}
+      {/* Branches Recommandées */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-600">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Branches Recommandées {searchQuery ? `pour "${searchQuery}"` : ''}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -2,10 +2,9 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRightIcon, SparklesIcon, StarIcon, UserGroupIcon, AcademicCapIcon, PlayIcon, ChartBarIcon, CodeBracketIcon, CogIcon } from '@heroicons/react/24/outline';
 
-function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
+function Home({ searchQuery = '' }) {
   const navigate = useNavigate();
 
-  // Données statiques inspirées Udemy/Coursera
   const featuredCourses = [
     { title: 'Développeur Python avec Microsoft', branch: 'Data Science', rating: 4.8, students: '10K+', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <ChartBarIcon className="h-12 w-12" />, color: 'indigo' },
     { title: 'React pour Débutants', branch: 'Web', rating: 4.7, students: '25K+', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <CodeBracketIcon className="h-12 w-12" />, color: 'blue' },
@@ -27,7 +26,7 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
     { name: 'Abdullahi M.', quote: 'De zéro à expert en 3 mois. Les vidéos YouTube et le tracking de progrès sont parfaits.', rating: 4.9 },
   ];
 
-  // Filtrage searchQuery
+  // Filtrage
   const filteredFeatured = featuredCourses.filter(c => 
     c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
     c.branch.toLowerCase().includes(searchQuery.toLowerCase())
@@ -36,7 +35,6 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
     cat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Composant Modulaire : Hero Section
   const HeroSection = () => (
     <section className="relative overflow-hidden py-20">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 dark:from-blue-500/30 dark:to-purple-500/30"></div>
@@ -58,7 +56,6 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
     </section>
   );
 
-  // Composant Modulaire : Featured Courses (Filtré)
   const FeaturedCourses = () => (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4">
@@ -85,7 +82,7 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{course.branch}</p>
                   <div className="flex items-center justify-center mb-2">
                     {[...Array(5)].map((_, i) => (
-                      <StarIcon key={i} className={`h-4 w-4 ${i < course.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                      <StarIcon key={i} className={`h-4 w-4 ${i < course.rating ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-500'}`} />
                     ))}
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{course.students} étudiants</p>
@@ -100,7 +97,6 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
     </section>
   );
 
-  // Composant Modulaire : Catégories (Filtré)
   const Categories = () => (
     <section className="py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4">
@@ -108,7 +104,7 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {filteredCategories.length > 0 ? filteredCategories.map((cat, index) => (
             <Link key={index} to="/branches" className="group">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-200 dark:border-gray-600">
                 <div className={`w-12 h-12 ${cat.color}-100 dark:${cat.color}-900 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform`}>
                   {cat.icon}
                 </div>
@@ -124,7 +120,6 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
     </section>
   );
 
-  // Composant Modulaire : Témoignages
   const Testimonials = () => (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4">
@@ -141,7 +136,7 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
                   <h4 className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</h4>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <StarIcon key={i} className={`h-4 w-4 ${i < testimonial.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                      <StarIcon key={i} className={`h-4 w-4 ${i < testimonial.rating ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-500'}`} />
                     ))}
                   </div>
                 </div>
@@ -153,7 +148,6 @@ function Home({ searchQuery = '' }) {  // Props searchQuery pour filtrage
     </section>
   );
 
-  // Composant Modulaire : CTA Final
   const CTASection = () => (
     <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-gray-800 dark:to-gray-700 text-white">
       <div className="max-w-4xl mx-auto text-center px-4">
