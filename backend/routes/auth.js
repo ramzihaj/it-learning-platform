@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email }).select('email name selectedBranch _id password'); // Optimisation
+    const user = await User.findOne({ email }).select('email name selectedBranch _id password role');  // Ajoute 'role'
     if (!user) {
       return res.status(400).json({ error: 'Utilisateur non trouvé' });
     }
@@ -42,9 +42,10 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ error: 'Mot de passe incorrect' });
     }
-   
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, userId: user._id, message: 'Connexion réussie' });
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    
+  
+    res.json({ token, userId: user._id, role: user.role, message: 'Connexion réussie' });
   } catch (error) {
     console.error('Erreur login:', error);
     res.status(500).json({ error: 'Erreur serveur' });
