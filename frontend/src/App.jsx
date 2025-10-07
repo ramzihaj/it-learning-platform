@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';  // Ajout useEffect
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { HomeIcon, Bars3Icon, XMarkIcon, ChartBarIcon, BookOpenIcon, UserGroupIcon, ClipboardDocumentCheckIcon, ArrowRightOnRectangleIcon, MagnifyingGlassIcon, UserIcon, CogIcon } from '@heroicons/react/24/outline'; // Ajout CogIcon
+import { HomeIcon, Bars3Icon, XMarkIcon, ChartBarIcon, BookOpenIcon, UserGroupIcon, ClipboardDocumentCheckIcon, ArrowRightOnRectangleIcon, MagnifyingGlassIcon, UserIcon, CogIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';  // Ajout MoonIcon, SunIcon
 import Signup from './components/Signup';
 import Login from './components/Login';
 import BranchSelection from './components/BranchSelection';
@@ -11,22 +11,37 @@ import Dashboard from './components/Dashboard';
 import Home from './components/Home';
 import Footer from './components/Footer';
 import Profile from './components/Profile';
-import AdminDashboard from './components/AdminDashboard';  // Nouveau import
-import { ToastContainer } from 'react-toastify';
+import AdminDashboard from './components/AdminDashboard';
+import { ToastContainer } from 'react-toastify';  // Si toasts déjà
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [userRole, setUserRole] = useState('');  // État pour rôle admin
+  const [userRole, setUserRole] = useState('');
+  const [theme, setTheme] = useState('light');  // Nouveau : state theme (light/dark)
 
-  // Fetch rôle au load (si connecté)
+  // Sync theme avec localStorage et applique sur <html>
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
+
+  // Fetch rôle (existant)
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       axios.get('http://localhost:5000/api/profile', { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setUserRole(res.data.user.role))
-        .catch(() => setUserRole(''));
+        .catch(() => {});
     }
   }, []);
 
@@ -34,10 +49,10 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex">
+      <div className={`min-h-screen ${theme === 'dark' ? 'dark bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700' : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100'} flex`}>
         {/* Sidebar */}
-        <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-blue-600 to-indigo-700 text-white transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <div className="p-4 flex justify-between items-center border-b border-blue-800">
+        <div className={`fixed inset-y-0 left-0 z-50 w-64 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gradient-to-b from-blue-600 to-indigo-700'} text-white transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="p-4 flex justify-between items-center border-b ${theme === 'dark' ? 'border-gray-600' : 'border-blue-800'}">
             <div className="flex items-center space-x-2">
               <HomeIcon className="h-6 w-6" />
               <span className="text-lg font-bold">IT Learn Pro</span>
@@ -71,7 +86,6 @@ function App() {
               <UserIcon className="h-5 w-5" />
               <span>Profil</span>
             </Link>
-            {/* Lien Admin Conditionnel */}
             {userRole === 'admin' && (
               <Link to="/admin" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-300 hover:scale-105" onClick={toggleSidebar}>
                 <CogIcon className="h-5 w-5" />
@@ -82,10 +96,15 @@ function App() {
               <ArrowRightOnRectangleIcon className="h-5 w-5" />
               <span>Connexion</span>
             </Link>
+            {/* Nouveau Bouton Toggle Theme */}
+            <button onClick={toggleTheme} className="flex items-center space-x-3 p-3 rounded-lg w-full hover:bg-blue-500/30 transition-all duration-300 hover:scale-105">
+              {theme === 'light' ? <MoonIcon className="h-5 w-5" /> : <SunIcon className="h-5 w-5" />}
+              <span>{theme === 'light' ? 'Mode Sombre' : 'Mode Clair'}</span>
+            </button>
           </nav>
         </div>
 
-        {/* Overlay pour fermer sidebar */}
+        {/* Overlay Sidebar */}
         {isSidebarOpen && (
           <div className="fixed inset-0 bg-black/50 z-40" onClick={toggleSidebar} />
         )}
@@ -93,19 +112,18 @@ function App() {
         {/* Bouton Toggle Sidebar */}
         <button 
           onClick={toggleSidebar} 
-          className="fixed left-4 top-4 z-40 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-110"
+          className={`fixed left-4 top-4 z-40 ${theme === 'dark' ? 'bg-gray-700' : 'bg-blue-600'} text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-110`}
         >
           <Bars3Icon className="h-6 w-6" />
         </button>
 
-        {/* Contenu Principal avec Barre de Recherche Globale */}
+        {/* Contenu Principal */}
         <div className="flex-1 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-4 py-6">
-            <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-            {/* Barre de Recherche Globale */}
+            {/* Barre Recherche Globale */}
             <div className="mb-6">
               <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
                 <input
                   type="text"
                   placeholder="Rechercher des cours, branches ou compétences..."
@@ -124,14 +142,17 @@ function App() {
               <Route path="/courses" element={<CourseList searchQuery={searchQuery} />} />
               <Route path="/progress" element={<Progress searchQuery={searchQuery} />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/admin" element={<AdminDashboard />} />  {/* Nouvelle route */}
+              <Route path="/admin" element={<AdminDashboard />} />
             </Routes>
           </div>
           <Footer />
         </div>
+
+        {/* Toast Container Global (si toasts utilisés) */}
+        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
       </div>
     </Router>
   );
-}
+};
 
 export default App;
