@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Course = require('../models/Course');
+const Progress = require('../models/Progress');
 const adminMiddleware = require('../middleware/admin'); // Nouveau middleware
 
 // GET : Liste tous les users (pour admin)
@@ -92,5 +93,41 @@ router.delete('/courses/all', adminMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
+// GET : Stats analytics (users par rôle/branche, cours populaires)
+router.get('/stats', adminMiddleware, async (req, res) => {
+  try {
+    // Users par rôle
+    const usersByRole = await User.aggregate([
+      { $group: { _id: '$role', count: { $sum: 1 } } }
+    ]);
 
+    // Users par branche (selectedBranch)
+    const usersByBranch = await User.aggregate([
+      { $group: { _id: '$selectedBranch', count: { $sum: 1 } } }
+    ]);
+
+    // Cours populaires (par branche, count)
+    const coursesByBranch = await Course.aggregate([
+      { $group: { _id: '$branch', count: { $sum: 1 } } }
+    ]);
+
+    // Total users, cours, avg complétion (ex. via Progress)
+    const totalUsers = await User.countDocuments();
+    const totalCourses = await Course.countDocuments();
+    const avgCompletion = await Progress.aggregate([
+      { $group: { _id: null, avg: { $avg: { $cond: [{ $eq: ['$completed', true] }, 1, 0] } } } }
+    ]);
+
+    res.json({
+      usersByRole,
+      usersByBranch,
+      coursesByBranch,
+      totals: { totalUsers, totalCourses },
+      avgCompletion: Math.round(avgCompletion[0]?.avg * 100 || 0)  // %
+    });
+  } catch (error) {
+    console.error('Erreur stats:', error);
+    res.status(500).json({ error: 'Erreur stats' });
+  }
+});
 module.exports = router;

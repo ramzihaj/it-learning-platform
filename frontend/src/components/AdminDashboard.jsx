@@ -3,13 +3,16 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { toast } from 'react-toastify';
-import { UserIcon, BookOpenIcon, TrashIcon, PlusIcon, ExclamationTriangleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import {
+  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
+import { UserIcon, BookOpenIcon, TrashIcon, PlusIcon, ExclamationTriangleIcon, MagnifyingGlassIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [stats, setStats] = useState({});  // Pour analytics
   const [newCourse, setNewCourse] = useState({ title: '', branch: '', youtubeUrl: '', description: '' });
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState('');
   const [searchUser, setSearchUser] = useState('');
@@ -29,6 +32,7 @@ const AdminDashboard = () => {
           return;
         }
 
+        // Fetch profile pour rôle
         const profileRes = await axios.get('http://localhost:5000/api/profile', { headers: { Authorization: `Bearer ${token}` } });
         if (profileRes.data.user.role !== 'admin') {
           toast.error('Accès refusé : Vous n\'êtes pas admin');
@@ -37,12 +41,15 @@ const AdminDashboard = () => {
         }
         setUserRole(profileRes.data.user.role);
 
-        const [usersRes, coursesRes] = await Promise.all([
+        // Fetch users, courses, stats
+        const [usersRes, coursesRes, statsRes] = await Promise.all([
           axios.get('http://localhost:5000/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:5000/api/admin/courses', { headers: { Authorization: `Bearer ${token}` } })
+          axios.get('http://localhost:5000/api/admin/courses', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:5000/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } })
         ]);
         setUsers(usersRes.data.users);
         setCourses(coursesRes.data.courses);
+        setStats(statsRes.data);
       } catch (error) {
         toast.error(error.response?.data?.error || 'Erreur chargement admin');
       } finally {
@@ -121,7 +128,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // ✅ NOUVEAU : handleDeleteCourse (pour suppression individuelle cours)
   const handleDeleteCourse = async (courseId) => {
     if (!window.confirm('Supprimer ce cours ?')) return;
     try {
@@ -135,7 +141,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // ✅ NOUVEAU : handleDeleteAllCourses (pour suppression tous cours)
   const handleDeleteAllCourses = async () => {
     if (!window.confirm('Supprimer TOUS les cours ? Irreversible !')) return;
     try {
@@ -153,6 +158,9 @@ const AdminDashboard = () => {
 
   if (loading) return <div className="p-4">Chargement...</div>;
   if (userRole !== 'admin') return <div className="p-4 text-red-500">Accès refusé</div>;
+
+  // Données pour Charts (de stats)
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   return (
     <div className="p-6 max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg">
@@ -274,6 +282,67 @@ const AdminDashboard = () => {
             className="flex justify-center mt-4 space-x-2 text-sm"
           />
         )}
+      </section>
+
+      {/* Section Analytics */}
+      <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-4">Analytics Admin</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg text-center">
+            <h3 className="font-semibold text-blue-600 dark:text-blue-300">Total Users</h3>
+            <p className="text-2xl font-bold">{stats.totals?.totalUsers || 0}</p>
+          </div>
+          <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg text-center">
+            <h3 className="font-semibold text-green-600 dark:text-green-300">Total Cours</h3>
+            <p className="text-2xl font-bold">{stats.totals?.totalCourses || 0}</p>
+          </div>
+          <div className="bg-purple-50 dark:bg-purple-900 p-4 rounded-lg text-center">
+            <h3 className="font-semibold text-purple-600 dark:text-purple-300">Taux Complétion Moy.</h3>
+            <p className="text-2xl font-bold">{stats.avgCompletion || 0}%</p>
+          </div>
+          <div className="bg-indigo-50 dark:bg-indigo-900 p-4 rounded-lg text-center">
+            <h3 className="font-semibold text-indigo-600 dark:text-indigo-300">Users Actifs</h3>
+            <p className="text-2xl font-bold">{stats.usersByRole?.find(r => r._id === 'admin')?.count || 0}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Bar Chart : Users par Rôle */}
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+            <h3 className="font-semibold mb-2">Users par Rôle</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={stats.usersByRole || []}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="_id" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Pie Chart : Cours par Branche */}
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+            <h3 className="font-semibold mb-2">Cours par Branche</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={stats.coursesByBranch || []}
+                  dataKey="count"
+                  nameKey="_id"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  fill="#8884d8"
+                  label
+                >
+                  {stats.coursesByBranch?.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042'][index % 4]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </section>
     </div>
   );
