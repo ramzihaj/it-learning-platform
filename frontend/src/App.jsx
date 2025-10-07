@@ -12,6 +12,8 @@ import Home from './components/Home';
 import Footer from './components/Footer';
 import Profile from './components/Profile';
 import AdminDashboard from './components/AdminDashboard';  // Nouveau import
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -99,6 +101,7 @@ function App() {
         {/* Contenu Principal avec Barre de Recherche Globale */}
         <div className="flex-1 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-4 py-6">
+            <ToastContainer position="top-right" autoClose={3000} theme="colored" />
             {/* Barre de Recherche Globale */}
             <div className="mb-6">
               <div className="relative">

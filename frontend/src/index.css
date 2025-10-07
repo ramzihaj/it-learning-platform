@@ -130,3 +130,25 @@ body {
   0% { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
 }
+.pagination {
+  list-style: none;
+}
+.pagination .page-item {
+  display: inline-block;
+}
+.pagination .page-link {
+  padding: 0.5rem 0.75rem;
+  margin: 0 2px;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  color: #007bff;
+  text-decoration: none;
+}
+.pagination .page-link:hover {
+  background-color: #e9ecef;
+}
+.pagination .active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
