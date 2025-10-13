@@ -45,44 +45,68 @@ function BranchSelection({ searchQuery = '' }) {
     }
   };
 
-  // Données par branche (icon, couleur, image attractive Unsplash)
+  // Données par branche avec classes Tailwind statiques (fix pour JIT compiler)
   const getBranchData = (name) => {
     switch (name.toLowerCase()) {
       case 'web':
         return { 
           icon: <CodeBracketIcon className="h-12 w-12" />, 
-          color: 'blue', 
-          image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' // Web dev laptop
+          bgClasses: 'from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800',
+          borderClasses: 'border-blue-200 dark:border-blue-700',
+          iconBgClasses: 'bg-blue-200 dark:bg-blue-700',
+          buttonClasses: 'from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-400 dark:hover:to-blue-500',
+          overlayClasses: 'from-blue-600/80',
+          image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
         };
       case 'ia':
         return { 
           icon: <SparklesIcon className="h-12 w-12" />, 
-          color: 'purple', 
-          image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' // AI brain
+          bgClasses: 'from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800',
+          borderClasses: 'border-purple-200 dark:border-purple-700',
+          iconBgClasses: 'bg-purple-200 dark:bg-purple-700',
+          buttonClasses: 'from-purple-600 to-purple-700 dark:from-purple-500 dark:to-purple-600 hover:from-purple-700 hover:to-purple-800 dark:hover:from-purple-400 dark:hover:to-purple-500',
+          overlayClasses: 'from-purple-600/80',
+          image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
         };
       case 'devops':
         return { 
           icon: <CogIcon className="h-12 w-12" />, 
-          color: 'green', 
-          image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' // DevOps gears
+          bgClasses: 'from-green-50 to-green-100 dark:from-green-900 dark:to-green-800',
+          borderClasses: 'border-green-200 dark:border-green-700',
+          iconBgClasses: 'bg-green-200 dark:bg-green-700',
+          buttonClasses: 'from-green-600 to-green-700 dark:from-green-500 dark:to-green-600 hover:from-green-700 hover:to-green-800 dark:hover:from-green-400 dark:hover:to-green-500',
+          overlayClasses: 'from-green-600/80',
+          image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
         };
       case 'cybersecurity':
         return { 
           icon: <ShieldCheckIcon className="h-12 w-12" />, 
-          color: 'red', 
-          image: 'https://tse4.mm.bing.net/th/id/OIP.iLoSgDQwC4WQ_09-dYXx8gHaEK?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3' // Security lock
+          bgClasses: 'from-red-50 to-red-100 dark:from-red-900 dark:to-red-800',
+          borderClasses: 'border-red-200 dark:border-red-700',
+          iconBgClasses: 'bg-red-200 dark:bg-red-700',
+          buttonClasses: 'from-red-600 to-red-700 dark:from-red-500 dark:to-red-600 hover:from-red-700 hover:to-red-800 dark:hover:from-red-400 dark:hover:to-red-500',
+          overlayClasses: 'from-red-600/80',
+          image: 'https://images.unsplash.com/photo-1632221326803-5f0d0a0ef706?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'data science':
         return { 
           icon: <ChartBarIcon className="h-12 w-12" />, 
-          color: 'indigo', 
-          image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' // Data charts
+          bgClasses: 'from-indigo-50 to-indigo-100 dark:from-indigo-900 dark:to-indigo-800',
+          borderClasses: 'border-indigo-200 dark:border-indigo-700',
+          iconBgClasses: 'bg-indigo-200 dark:bg-indigo-700',
+          buttonClasses: 'from-indigo-600 to-indigo-700 dark:from-indigo-500 dark:to-indigo-600 hover:from-indigo-700 hover:to-indigo-800 dark:hover:from-indigo-400 dark:hover:to-indigo-500',
+          overlayClasses: 'from-indigo-600/80',
+          image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
         };
       default:
         return { 
           icon: <CodeBracketIcon className="h-12 w-12" />, 
-          color: 'gray', 
-          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' // Default tech
+          bgClasses: 'from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800',
+          borderClasses: 'border-gray-200 dark:border-gray-700',
+          iconBgClasses: 'bg-gray-200 dark:bg-gray-700',
+          buttonClasses: 'from-gray-600 to-gray-700 dark:from-gray-500 dark:to-gray-600 hover:from-gray-700 hover:to-gray-800 dark:hover:from-gray-400 dark:hover:to-gray-500',
+          overlayClasses: 'from-gray-600/80',
+          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
         };
     }
   };
@@ -99,11 +123,11 @@ function BranchSelection({ searchQuery = '' }) {
       <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ${filteredBranches.length > 0 ? '' : 'grid-cols-1'}`}>
         {filteredBranches.length > 0 ? (
           filteredBranches.map(branch => {
-            const { icon, color, image } = getBranchData(branch.name);
+            const { icon, bgClasses, borderClasses, iconBgClasses, buttonClasses, overlayClasses, image } = getBranchData(branch.name);
             return (
               <div
                 key={branch._id}
-                className={`relative overflow-hidden bg-gradient-to-br from-${color}-50 to-${color}-100 dark:from-${color}-900 dark:to-${color}-800 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 cursor-pointer border border-${color}-200 dark:border-${color}-700 group`}
+                className={`relative overflow-hidden bg-gradient-to-br ${bgClasses} rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 cursor-pointer border ${borderClasses} group`}
                 onClick={() => handleSelect(branch._id)}
               >
                 {/* Image Attractif en Haut */}
@@ -113,15 +137,15 @@ function BranchSelection({ searchQuery = '' }) {
                     alt={branch.name} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-${color}-600/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div> {/* Overlay gradient sur hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-t ${overlayClasses} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
                 </div>
                 <div className="p-6 text-center">
-                  <div className={`p-3 rounded-full mx-auto mb-4 bg-${color}-200 dark:bg-${color}-700 group-hover:scale-110 transition-transform`}> {/* Icon coloré */}
+                  <div className={`p-3 rounded-full mx-auto mb-4 ${iconBgClasses} group-hover:scale-110 transition-transform`}>
                     {icon}
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{branch.name}</h3>
                   <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{branch.description}</p>
-                  <button className="mt-4 w-full bg-gradient-to-r from-${color}-600 to-${color}-700 dark:from-${color}-500 dark:to-${color}-600 text-white py-2 rounded-lg hover:from-${color}-700 hover:to-${color}-800 dark:hover:from-${color}-400 dark:hover:to-${color}-500 transition-all duration-300 font-semibold group-hover:scale-105">
+                  <button className={`mt-4 w-full bg-gradient-to-r ${buttonClasses} text-white py-2 rounded-lg transition-all duration-300 font-semibold group-hover:scale-105`}>
                     Sélectionner cette Branche
                   </button>
                 </div>

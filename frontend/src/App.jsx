@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { HomeIcon, Bars3Icon, XMarkIcon, ChartBarIcon, BookOpenIcon, UserGroupIcon, ClipboardDocumentCheckIcon, ArrowRightOnRectangleIcon, MagnifyingGlassIcon, UserIcon, CogIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';  // Ajout MoonIcon, SunIcon
+import { HomeIcon, Bars3Icon, XMarkIcon, ChartBarIcon, BookOpenIcon, UserGroupIcon, ClipboardDocumentCheckIcon, ArrowRightOnRectangleIcon, MagnifyingGlassIcon, UserIcon, CogIcon, MoonIcon, SunIcon, EnvelopeIcon } from '@heroicons/react/24/outline';  // Ajout MoonIcon, SunIcon, EnvelopeIcon
 import Signup from './components/Signup';
 import Login from './components/Login';
 import BranchSelection from './components/BranchSelection';
@@ -12,6 +12,7 @@ import Home from './components/Home';
 import Footer from './components/Footer';
 import Profile from './components/Profile';
 import AdminDashboard from './components/AdminDashboard';
+import Contact from './components/Contact';
 import { ToastContainer } from 'react-toastify';  // Si toasts déjà
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -86,6 +87,10 @@ function App() {
               <UserIcon className="h-5 w-5" />
               <span>Profil</span>
             </Link>
+            <Link to="/contact" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-300 hover:scale-105" onClick={toggleSidebar}>
+              <EnvelopeIcon className="h-5 w-5" />
+              <span>Contact</span>
+            </Link>
             {userRole === 'admin' && (
               <Link to="/admin" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-300 hover:scale-105" onClick={toggleSidebar}>
                 <CogIcon className="h-5 w-5" />
@@ -142,6 +147,7 @@ function App() {
               <Route path="/courses" element={<CourseList searchQuery={searchQuery} />} />
               <Route path="/progress" element={<Progress searchQuery={searchQuery} />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/admin" element={<AdminDashboard />} />
             </Routes>
           </div>

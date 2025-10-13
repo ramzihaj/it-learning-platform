@@ -99,7 +99,7 @@ function CourseList({ searchQuery = '' }) {
     return match ? match[1] : null;
   };
 
-  // Données par branche pour images/icons (attractifs) - Corrigé avec fallback pour branch undefined
+  // Données par branche pour images/icons avec classes statiques (fix pour JIT compiler)
   const getCourseData = (branch) => {
     const safeBranch = branch || 'web'; // Fallback si branch undefined
     console.log('getCourseData branch:', safeBranch); // Debug pour tracer
@@ -107,37 +107,31 @@ function CourseList({ searchQuery = '' }) {
       case 'web':
         return { 
           icon: <CodeBracketIcon className="h-12 w-12" />, 
-          color: 'blue', 
           image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'ia':
         return { 
           icon: <SparklesIcon className="h-12 w-12" />, 
-          color: 'purple', 
           image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'devops':
         return { 
           icon: <CogIcon className="h-12 w-12" />, 
-          color: 'green', 
           image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'cybersecurity':
         return { 
           icon: <ShieldCheckIcon className="h-12 w-12" />, 
-          color: 'red', 
           image: 'https://images.unsplash.com/photo-1632221326803-5f0d0a0ef706?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       case 'data science':
         return { 
           icon: <ChartBarIcon className="h-12 w-12" />, 
-          color: 'indigo', 
           image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
       default:
         return { 
           icon: <PlayIcon className="h-12 w-12" />, 
-          color: 'gray', 
           image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
         };
     }
@@ -150,7 +144,7 @@ function CourseList({ searchQuery = '' }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCourses.length > 0 ? (
           filteredCourses.map(course => {
-            const { icon, color, image } = getCourseData(course.branch);
+            const { icon, image } = getCourseData(course.branch);
             return (
               <div
                 key={course._id}

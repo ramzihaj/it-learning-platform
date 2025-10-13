@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.4.0",
     "@stripe/stripe-js": "^8.0.0",
     "@tailwindcss/vite": "^4.1.13",
     "@tremor/react": "^3.18.7",
@@ -24,7 +26,8 @@
     "react-toastify": "^11.0.5",
     "react-youtube": "^10.1.0",
     "recharts": "^3.2.1",
-    "tailwindcss": "^4.1.13"
+    "tailwindcss": "^4.1.13",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

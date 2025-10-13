@@ -1,23 +1,24 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRightIcon, SparklesIcon, StarIcon, UserGroupIcon, AcademicCapIcon, PlayIcon, ChartBarIcon, CodeBracketIcon, CogIcon } from '@heroicons/react/24/outline';
+import Hero3D from './Hero3D';
 
 function Home({ searchQuery = '' }) {
   const navigate = useNavigate();
 
   const featuredCourses = [
-    { title: 'Développeur Python avec Microsoft', branch: 'Data Science', rating: 4.8, students: '10K+', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <ChartBarIcon className="h-12 w-12" />, color: 'indigo' },
-    { title: 'React pour Débutants', branch: 'Web', rating: 4.7, students: '25K+', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <CodeBracketIcon className="h-12 w-12" />, color: 'blue' },
-    { title: 'Introduction à l\'IA', branch: 'IA', rating: 4.9, students: '15K+', image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <SparklesIcon className="h-12 w-12" />, color: 'purple' },
-    { title: 'DevOps avec Docker', branch: 'DevOps', rating: 4.6, students: '8K+', image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <CogIcon className="h-12 w-12" />, color: 'green' },
+    { title: 'Développeur Python avec Microsoft', branch: 'Data Science', rating: 4.8, students: '10K+', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <ChartBarIcon className="h-12 w-12" />, iconBgClasses: 'bg-indigo-200 dark:bg-indigo-700' },
+    { title: 'React pour Débutants', branch: 'Web', rating: 4.7, students: '25K+', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <CodeBracketIcon className="h-12 w-12" />, iconBgClasses: 'bg-blue-200 dark:bg-blue-700' },
+    { title: 'Introduction à l\'IA', branch: 'IA', rating: 4.9, students: '15K+', image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <SparklesIcon className="h-12 w-12" />, iconBgClasses: 'bg-purple-200 dark:bg-purple-700' },
+    { title: 'DevOps avec Docker', branch: 'DevOps', rating: 4.6, students: '8K+', image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <CogIcon className="h-12 w-12" />, iconBgClasses: 'bg-green-200 dark:bg-green-700' },
   ];
 
   const categories = [
-    { name: 'Web Dev', icon: <AcademicCapIcon className="h-8 w-8" />, color: 'blue' },
-    { name: 'IA & ML', icon: <SparklesIcon className="h-8 w-8" />, color: 'purple' },
-    { name: 'DevOps', icon: <PlayIcon className="h-8 w-8" />, color: 'green' },
-    { name: 'Cybersecurity', icon: <UserGroupIcon className="h-8 w-8" />, color: 'red' },
-    { name: 'Data Science', icon: <StarIcon className="h-8 w-8" />, color: 'yellow' },
+    { name: 'Web Dev', icon: <AcademicCapIcon className="h-8 w-8" />, bgClasses: 'bg-blue-100 dark:bg-blue-900' },
+    { name: 'IA & ML', icon: <SparklesIcon className="h-8 w-8" />, bgClasses: 'bg-purple-100 dark:bg-purple-900' },
+    { name: 'DevOps', icon: <PlayIcon className="h-8 w-8" />, bgClasses: 'bg-green-100 dark:bg-green-900' },
+    { name: 'Cybersecurity', icon: <UserGroupIcon className="h-8 w-8" />, bgClasses: 'bg-red-100 dark:bg-red-900' },
+    { name: 'Data Science', icon: <StarIcon className="h-8 w-8" />, bgClasses: 'bg-yellow-100 dark:bg-yellow-900' },
   ];
 
   const testimonials = [
@@ -38,20 +39,29 @@ function Home({ searchQuery = '' }) {
   const HeroSection = () => (
     <section className="relative overflow-hidden py-20">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 dark:from-blue-500/30 dark:to-purple-500/30"></div>
-      <div className="relative max-w-7xl mx-auto px-4 text-center">
-        <SparklesIcon className="h-16 w-16 text-yellow-400 dark:text-yellow-300 mx-auto mb-4 animate-pulse" />
-        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 animate-fadeInUp">
-          Apprenez sans Limites
-        </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto animate-fadeInUp animation-delay-300">
-          Démarrez, changez ou boostez votre carrière avec 10 000+ cours de top organisations. De Python à DevOps, devenez expert en IT – gratuit et flexible, comme Udemy et Coursera.
-        </p>
-        <button
-          onClick={() => navigate('/signup')}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-400 dark:hover:to-purple-400 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-        >
-          Commencez à Apprendre <ArrowRightIcon className="h-5 w-5 inline ml-2" />
-        </button>
+      
+      {/* Animation 3D Hero */}
+      <div className="relative z-10">
+        <Hero3D />
+      </div>
+      
+      {/* Contenu texte par-dessus */}
+      <div className="relative z-20 max-w-7xl mx-auto px-4 text-center -mt-32 md:-mt-40 lg:-mt-48">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
+          <SparklesIcon className="h-16 w-16 text-yellow-400 dark:text-yellow-300 mx-auto mb-4 animate-pulse" />
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 animate-fadeInUp">
+            Apprenez sans Limites
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto animate-fadeInUp animation-delay-300">
+            Démarrez, changez ou boostez votre carrière avec 10 000+ cours de top organisations. De Python à DevOps, devenez expert en IT – gratuit et flexible, comme Udemy et Coursera.
+          </p>
+          <button
+            onClick={() => navigate('/signup')}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-400 dark:hover:to-purple-400 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            Commencez à Apprendre <ArrowRightIcon className="h-5 w-5 inline ml-2" />
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -75,7 +85,7 @@ function Home({ searchQuery = '' }) {
                   </div>
                 </div>
                 <div className="p-4 text-center">
-                  <div className={`p-3 rounded-full mx-auto mb-4 bg-${course.color}-200 dark:bg-${course.color}-700 group-hover:scale-110 transition-transform`}>
+                  <div className={`p-3 rounded-full mx-auto mb-4 ${course.iconBgClasses} group-hover:scale-110 transition-transform`}>
                     {course.icon}
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{course.title}</h3>
@@ -105,7 +115,7 @@ function Home({ searchQuery = '' }) {
           {filteredCategories.length > 0 ? filteredCategories.map((cat, index) => (
             <Link key={index} to="/branches" className="group">
               <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-200 dark:border-gray-600">
-                <div className={`w-12 h-12 ${cat.color}-100 dark:${cat.color}-900 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 ${cat.bgClasses} rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform`}>
                   {cat.icon}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{cat.name}</h3>
