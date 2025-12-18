@@ -2,10 +2,11 @@ services:
   - type: web
     name: it-learning-platform-api
     env: node
+    rootDir: backend
     region: frankfurt
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
