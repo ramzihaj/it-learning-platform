@@ -2,204 +2,259 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import YouTube from 'react-youtube';
 import { useNavigate } from 'react-router-dom';
-import Quiz from './Quiz';
-import { CodeBracketIcon, SparklesIcon, CogIcon, ShieldCheckIcon, ChartBarIcon, PlayIcon } from '@heroicons/react/24/outline';
+import { getBranchImage } from '@/assets/images';
+import { api, getYouTubeId } from '@/utils/helpers';
+import { BRANCH_STYLES } from '@/utils/branchStyles';
 
+/**
+ * Composant affichant la liste des cours pour la branche sélectionnée
+ * Permet de regarder les vidéos, marquer les cours comme complétés,
+ * et générer des résumés et quiz IA
+ * 
+ * @component
+ * @param {string} searchQuery - Terme de recherche pour filtrer les cours
+ * @returns {JSX.Element} Le composant de liste de cours
+ */
 function CourseList({ searchQuery = '' }) {
   const [courses, setCourses] = useState([]);
   const [message, setMessage] = useState('');
   const [showSummary, setShowSummary] = useState(null);
-  const [showQuiz, setShowQuiz] = useState(null); // Corrigé : setShowQuiz
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  /**
+   * Charger les cours de la branche sélectionnée
+   */
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem('token');
+        
         if (!token) {
-          setMessage('Veuillez vous connecter d’abord');
+          setMessage('Veuillez vous connecter d\'abord');
           setTimeout(() => navigate('/login'), 1000);
           return;
         }
 
-        const branch = localStorage.getItem('selectedBranch') || 'Web';
-        const response = await axios.get(`http://localhost:5000/api/courses/${branch}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const selectedBranch = localStorage.getItem('selectedBranch') || 'Web';
+        const response = await axios.get(
+          `${api.baseURL}/api/courses/${selectedBranch}`,
+          { headers: api.getAuthHeader() }
+        );
+        
         setCourses(response.data);
       } catch (error) {
-        setMessage(error.response?.data.error || 'Erreur lors du chargement des cours');
+        const errorMsg = error.response?.data?.error || 'Erreur lors du chargement des cours';
+        setMessage(errorMsg);
+        console.error('Erreur chargement cours:', error);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchCourses();
   }, [navigate]);
 
-  // Filtre réactif avec useMemo
+  /**
+   * Filtrer les cours selon la recherche
+   */
   const filteredCourses = useMemo(() => {
     if (!searchQuery.trim()) return courses;
+    
     return courses.filter(course => 
       course.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
       course.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [courses, searchQuery]);
 
+  /**
+   * Marquer un cours comme complété
+   * @param {string} courseId - L'ID du cours
+   */
   const handleMarkCompleted = async (courseId) => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/progress',
+        `${api.baseURL}/api/progress`,
         { courseId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: api.getAuthHeader() }
       );
+
       setMessage(response.data.message);
-      // Refresh courses
-      const branch = localStorage.getItem('selectedBranch') || 'Web';
-      const updatedCourses = await axios.get(`http://localhost:5000/api/courses/${branch}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCourses(updatedCourses.data);
+      
+      // Rafraîchir la liste des cours
+      const selectedBranch = localStorage.getItem('selectedBranch') || 'Web';
+      const updatedResponse = await axios.get(
+        `${api.baseURL}/api/courses/${selectedBranch}`,
+        { headers: api.getAuthHeader() }
+      );
+      
+      setCourses(updatedResponse.data);
     } catch (error) {
-      setMessage(error.response?.data.error || 'Erreur lors de la mise à jour du progrès');
+      const errorMsg = error.response?.data?.error || 'Erreur lors de la mise à jour du progrès';
+      setMessage(errorMsg);
+      console.error('Erreur marquer complété:', error);
     }
   };
 
+  /**
+   * Générer un résumé IA pour un cours
+   * @param {string} courseId - L'ID du cours
+   */
   const handleGenerateSummary = async (courseId) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.post(
-        `http://localhost:5000/api/summary/generate/${courseId}`,
+        `${api.baseURL}/api/summary/generate/${courseId}`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: api.getAuthHeader() }
       );
-      setShowSummary({ id: courseId, summary: response.data.summary, title: response.data.courseTitle });
-      setMessage('Résumé généré avec succès !');
+
+      setShowSummary({
+        id: courseId,
+        summary: response.data.summary,
+        title: response.data.courseTitle
+      });
+      setMessage('✓ Résumé généré avec succès !');
     } catch (error) {
-      setMessage(error.response?.data.error || 'Erreur lors de la génération du résumé');
+      const errorMsg = error.response?.data?.error || 'Erreur lors de la génération du résumé';
+      setMessage(errorMsg);
+      console.error('Erreur génération résumé:', error);
     }
   };
 
-  const handleGenerateQuiz = async (courseId) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `http://localhost:5000/api/summary/quiz/${courseId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setShowQuiz({ id: courseId, quiz: response.data.quiz, title: response.data.courseTitle });
-      setMessage('Quiz généré avec succès !');
-    } catch (error) {
-      setMessage(error.response?.data.error || 'Erreur lors de la génération du quiz');
-    }
-  };
 
-  const getYouTubeId = (url) => {
-    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
-  };
 
-  // Données par branche pour images/icons avec classes statiques (fix pour JIT compiler)
-  const getCourseData = (branch) => {
-    const safeBranch = branch || 'web'; // Fallback si branch undefined
-    console.log('getCourseData branch:', safeBranch); // Debug pour tracer
-    switch (safeBranch.toLowerCase()) {
-      case 'web':
-        return { 
-          icon: <CodeBracketIcon className="h-12 w-12" />, 
-          image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
-      case 'ia':
-        return { 
-          icon: <SparklesIcon className="h-12 w-12" />, 
-          image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
-      case 'devops':
-        return { 
-          icon: <CogIcon className="h-12 w-12" />, 
-          image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
-      case 'cybersecurity':
-        return { 
-          icon: <ShieldCheckIcon className="h-12 w-12" />, 
-          image: 'https://images.unsplash.com/photo-1632221326803-5f0d0a0ef706?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
-      case 'data science':
-        return { 
-          icon: <ChartBarIcon className="h-12 w-12" />, 
-          image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
-      default:
-        return { 
-          icon: <PlayIcon className="h-12 w-12" />, 
-          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-        };
-    }
+  /**
+   * Obtenir les styles pour une branche
+   * @param {string} branchName - Nom de la branche
+   * @returns {Object} Objet contenant les styles
+   */
+  const getBranchData = (branchName) => {
+    const normalizedName = branchName?.toLowerCase().trim() || 'web';
+    return BRANCH_STYLES[normalizedName] || BRANCH_STYLES.default;
   };
 
   return (
     <div className="p-4 max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-      <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white text-center">Cours Disponibles</h2>
-      {message && <p className={`mb-4 p-3 rounded-lg text-center ${message.includes('succès') || message.includes('complété') ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'}`}>{message}</p>}
+      <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white text-center">
+        Cours Disponibles
+      </h2>
+
+      {/* Message d'état */}
+      {message && (
+        <p className={`mb-4 p-3 rounded-lg text-center font-medium ${
+          message.includes('✓') || message.includes('succès') || message.includes('complété')
+            ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+            : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+        }`}>
+          {message}
+        </p>
+      )}
+
+      {/* Grille de cours */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCourses.length > 0 ? (
+        {loading ? (
+          // État de chargement
+          <div className="col-span-full text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="text-gray-600 dark:text-gray-300 mt-4">Chargement des cours...</p>
+          </div>
+        ) : filteredCourses.length > 0 ? (
+          // Afficher les cours
           filteredCourses.map(course => {
-            const { icon, image } = getCourseData(course.branch);
+            const styles = getBranchData(course.branch);
+            const courseImage = getBranchImage(course.branch);
+            const youtubeId = getYouTubeId(course.youtubeUrl);
+
             return (
               <div
                 key={course._id}
-                className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow"
+                className="bg-white dark:bg-gray-700 p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col"
               >
-                <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{course.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">{course.description}</p>
-                <YouTube
-                  videoId={getYouTubeId(course.youtubeUrl)}
-                  className="w-full"
-                  opts={{ width: '100%', height: '200px' }}
-                />
-                <div className="mt-4 space-x-2">
-                  <button
-                    onClick={() => handleMarkCompleted(course._id)}
-                    className="bg-green-500 dark:bg-green-600 text-white p-2 rounded hover:bg-green-600 dark:hover:bg-green-700 transition-colors duration-300 flex-1"
-                  >
-                    Marquer comme complété
-                  </button>
-                  <button
-                    onClick={() => handleGenerateSummary(course._id)}
-                    className="bg-purple-500 dark:bg-purple-600 text-white p-2 rounded hover:bg-purple-600 dark:hover:bg-purple-700 transition-colors duration-300 flex-1"
-                  >
-                    Résumé IA
-                  </button>
-                  <button
-                    onClick={() => handleGenerateQuiz(course._id)}
-                    className="bg-orange-500 dark:bg-orange-600 text-white p-2 rounded hover:bg-orange-600 dark:hover:bg-orange-700 transition-colors duration-300 flex-1"
-                  >
-                    Quiz IA
-                  </button>
+                {/* Image du cours */}
+                <div className="mb-4 h-32 overflow-hidden rounded-lg">
+                  <img
+                    src={courseImage}
+                    alt={course.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
 
-                {/* Affichage du résumé IA */}
+                {/* Titre du cours */}
+                <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white line-clamp-2">
+                  {course.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm flex-grow line-clamp-3">
+                  {course.description}
+                </p>
+
+                {/* Vidéo YouTube */}
+                {youtubeId ? (
+                  <YouTube
+                    videoId={youtubeId}
+                    className="w-full mb-4"
+                    opts={{ width: '100%', height: '180px' }}
+                    onError={(error) => console.error('Erreur YouTube:', error)}
+                  />
+                ) : (
+                  <div className="w-full h-32 mb-4 bg-gray-300 dark:bg-gray-600 rounded flex items-center justify-center text-gray-600 dark:text-gray-300">
+                    Vidéo non disponible
+                  </div>
+                )}
+
+                {/* Résumé IA si affiché */}
                 {showSummary && showSummary.id === course._id && (
-                  <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded">
-                    <h4 className="font-bold mb-2 text-gray-900 dark:text-white">Résumé IA pour {showSummary.title} :</h4>
-                    <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">{showSummary.summary}</p>
-                    <button onClick={() => setShowSummary(null)} className="mt-2 text-blue-500 dark:text-blue-400 underline">
+                  <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <h4 className="font-bold mb-2 text-blue-900 dark:text-blue-100">
+                      Résumé IA :
+                    </h4>
+                    <p className="whitespace-pre-wrap text-sm text-blue-800 dark:text-blue-200 max-h-40 overflow-y-auto">
+                      {showSummary.summary}
+                    </p>
+                    <button
+                      onClick={() => setShowSummary(null)}
+                      className="mt-2 text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                    >
                       Fermer
                     </button>
                   </div>
                 )}
 
-                {/* Affichage du quiz IA */}
-                {showQuiz && showQuiz.id === course._id && (
-                  <div className="mt-4">
-                    <Quiz quiz={showQuiz.quiz} onClose={() => setShowQuiz(null)} />
-                  </div>
-                )}
+
+
+                {/* Boutons d'action */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
+                  <button
+                    onClick={() => handleMarkCompleted(course._id)}
+                    className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors duration-300 font-medium text-sm"
+                    title="Marquer ce cours comme complété"
+                  >
+                    ✓ Complété
+                  </button>
+                  <button
+                    onClick={() => handleGenerateSummary(course._id)}
+                    className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white px-3 py-2 rounded-lg transition-colors duration-300 font-medium text-sm"
+                    title="Générer un résumé avec l'IA"
+                  >
+                    📝 Résumé
+                  </button>
+                </div>
               </div>
             );
           })
         ) : (
-          <p className="text-gray-500 dark:text-gray-400 text-center py-8 col-span-full">Aucun cours trouvé – essayez un autre terme de recherche.</p>
+          // Aucun cours trouvé
+          <div className="col-span-full text-center py-12">
+            <p className="text-xl text-gray-500 dark:text-gray-400 font-semibold mb-2">
+              Aucun cours trouvé
+            </p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Essayez un autre terme de recherche.
+            </p>
+          </div>
         )}
       </div>
     </div>

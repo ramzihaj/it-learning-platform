@@ -1,18 +1,64 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRightIcon, SparklesIcon, StarIcon, UserGroupIcon, AcademicCapIcon, PlayIcon, ChartBarIcon, CodeBracketIcon, CogIcon } from '@heroicons/react/24/outline';
-import Hero3D from './Hero3D';
+import { COURSE_IMAGES, getBranchImage } from '@/assets/images';
 
+/**
+ * Composant Home - Page d'accueil de la plateforme
+ * Affiche les cours populaires, catégories, et témoignages
+ * 
+ * @component
+ * @param {string} searchQuery - Terme de recherche pour filtrer
+ * @returns {JSX.Element} La page d'accueil
+ */
 function Home({ searchQuery = '' }) {
   const navigate = useNavigate();
 
+  /**
+   * Cours populaires avec images centralisées
+   */
   const featuredCourses = [
-    { title: 'Développeur Python avec Microsoft', branch: 'Data Science', rating: 4.8, students: '10K+', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <ChartBarIcon className="h-12 w-12" />, iconBgClasses: 'bg-indigo-200 dark:bg-indigo-700' },
-    { title: 'React pour Débutants', branch: 'Web', rating: 4.7, students: '25K+', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <CodeBracketIcon className="h-12 w-12" />, iconBgClasses: 'bg-blue-200 dark:bg-blue-700' },
-    { title: 'Introduction à l\'IA', branch: 'IA', rating: 4.9, students: '15K+', image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <SparklesIcon className="h-12 w-12" />, iconBgClasses: 'bg-purple-200 dark:bg-purple-700' },
-    { title: 'DevOps avec Docker', branch: 'DevOps', rating: 4.6, students: '8K+', image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', icon: <CogIcon className="h-12 w-12" />, iconBgClasses: 'bg-green-200 dark:bg-green-700' },
+    {
+      title: 'Développeur Python avec Microsoft',
+      branch: 'Data Science',
+      rating: 4.8,
+      students: '10K+',
+      image: COURSE_IMAGES.pythonDeveloper,
+      icon: <ChartBarIcon className="h-12 w-12" />,
+      iconBgClasses: 'bg-indigo-200 dark:bg-indigo-700'
+    },
+    {
+      title: 'React pour Débutants',
+      branch: 'Web',
+      rating: 4.7,
+      students: '25K+',
+      image: COURSE_IMAGES.reactBeginner,
+      icon: <CodeBracketIcon className="h-12 w-12" />,
+      iconBgClasses: 'bg-blue-200 dark:bg-blue-700'
+    },
+    {
+      title: 'Introduction à l\'IA',
+      branch: 'IA',
+      rating: 4.9,
+      students: '15K+',
+      image: COURSE_IMAGES.introToAI,
+      icon: <SparklesIcon className="h-12 w-12" />,
+      iconBgClasses: 'bg-purple-200 dark:bg-purple-700'
+    },
+    {
+      title: 'DevOps avec Docker',
+      branch: 'DevOps',
+      rating: 4.6,
+      students: '8K+',
+      image: COURSE_IMAGES.devopsDocker,
+      icon: <CogIcon className="h-12 w-12" />,
+      iconBgClasses: 'bg-green-200 dark:bg-green-700'
+    },
   ];
 
+  /**
+   * Catégories de cours
+   */
   const categories = [
     { name: 'Web Dev', icon: <AcademicCapIcon className="h-8 w-8" />, bgClasses: 'bg-blue-100 dark:bg-blue-900' },
     { name: 'IA & ML', icon: <SparklesIcon className="h-8 w-8" />, bgClasses: 'bg-purple-100 dark:bg-purple-900' },
@@ -21,132 +67,237 @@ function Home({ searchQuery = '' }) {
     { name: 'Data Science', icon: <StarIcon className="h-8 w-8" />, bgClasses: 'bg-yellow-100 dark:bg-yellow-900' },
   ];
 
+  /**
+   * Témoignages d'utilisateurs
+   */
   const testimonials = [
-    { name: 'Sarah W.', quote: 'Coursera m\'a aidée à changer de carrière en data analytics tout en gérant ma vie familiale. Flexible et puissant !', rating: 5 },
-    { name: 'Noeris B.', quote: 'Les cours gratuits et les quizzes IA m\'ont donné confiance pour mon premier job en dev.', rating: 5 },
-    { name: 'Abdullahi M.', quote: 'De zéro à expert en 3 mois. Les vidéos YouTube et le tracking de progrès sont parfaits.', rating: 4.9 },
+    {
+      name: 'Sarah W.',
+      quote: 'Cette plateforme m\'a aidée à changer de carrière en data analytics tout en gérant ma vie familiale. Flexible et puissant !',
+      rating: 5
+    },
+    {
+      name: 'Noeris B.',
+      quote: 'Les cours gratuits et les quizzes IA m\'ont donné confiance pour mon premier job en dev.',
+      rating: 5
+    },
+    {
+      name: 'Abdullahi M.',
+      quote: 'De zéro à expert en 3 mois. Les vidéos et le tracking de progrès sont parfaits.',
+      rating: 4.9
+    },
   ];
 
-  // Filtrage
-  const filteredFeatured = featuredCourses.filter(c => 
-    c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    c.branch.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const filteredCategories = categories.filter(cat => 
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  /**
+   * Filtrer les cours populaires
+   */
+  const filteredFeatured = useMemo(() => {
+    if (!searchQuery.trim()) return featuredCourses;
+    
+    return featuredCourses.filter(c =>
+      c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.branch.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
 
+  /**
+   * Filtrer les catégories
+   */
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery.trim()) return categories;
+    
+    return categories.filter(cat =>
+      cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
+  /**
+   * Section Hero avec animation 3D
+   */
   const HeroSection = () => (
     <section className="relative overflow-hidden py-20">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 dark:from-blue-500/30 dark:to-purple-500/30"></div>
-      
-      {/* Animation 3D Hero */}
-      <div className="relative z-10">
-        <Hero3D />
-      </div>
-      
-      {/* Contenu texte par-dessus */}
-      <div className="relative z-20 max-w-7xl mx-auto px-4 text-center -mt-32 md:-mt-40 lg:-mt-48">
+
+      {/* Contenu texte */}
+      <div className="relative z-20 max-w-7xl mx-auto px-4 text-center py-20">
         <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
           <SparklesIcon className="h-16 w-16 text-yellow-400 dark:text-yellow-300 mx-auto mb-4 animate-pulse" />
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 animate-fadeInUp">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
             Apprenez sans Limites
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto animate-fadeInUp animation-delay-300">
-            Démarrez, changez ou boostez votre carrière avec 10 000+ cours de top organisations. De Python à DevOps, devenez expert en IT – gratuit et flexible, comme Udemy et Coursera.
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+            Démarrez, changez ou boostez votre carrière avec 10 000+ cours de top organisations. De Python à DevOps, devenez expert en IT – gratuit et flexible.
           </p>
           <button
             onClick={() => navigate('/signup')}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-400 dark:hover:to-purple-400 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-400 dark:hover:to-purple-400 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
           >
-            Commencez à Apprendre <ArrowRightIcon className="h-5 w-5 inline ml-2" />
+            Commencez à Apprendre
+            <ArrowRightIcon className="h-5 w-5" />
           </button>
         </div>
       </div>
     </section>
   );
 
+  /**
+   * Section des cours populaires
+   */
   const FeaturedCourses = () => (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 animate-fadeInUp">Cours Populaires {searchQuery ? `pour "${searchQuery}"` : ''}</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
+          ⭐ Cours Populaires
+          {searchQuery && <span className="text-gray-600 dark:text-gray-400 font-normal"> pour "{searchQuery}"</span>}
+        </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredFeatured.length > 0 ? filteredFeatured.map((course, index) => (
-            <Link key={index} to="/courses" className="group">
-              <div className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-200 dark:border-gray-600">
-                <div className="relative h-32 overflow-hidden">
-                  <img 
-                    src={course.image} 
-                    alt={course.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                    <PlayIcon className="h-8 w-8 text-white" />
+          {filteredFeatured.length > 0 ? (
+            filteredFeatured.map((course, index) => (
+              <Link key={index} to="/courses" className="group">
+                <div className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-200 dark:border-gray-600">
+                  {/* Image du cours */}
+                  <div className="relative h-40 overflow-hidden">
+                    <img
+                      src={course.image}
+                      alt={course.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-4">
+                      <PlayIcon className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Contenu */}
+                  <div className="p-4 text-center">
+                    <div className={`p-3 rounded-full mx-auto mb-3 w-fit ${course.iconBgClasses} group-hover:scale-110 transition-transform`}>
+                      {course.icon}
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                      {course.branch}
+                    </p>
+
+                    {/* Note */}
+                    <div className="flex items-center justify-center gap-1 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <StarIcon
+                          key={i}
+                          className={`h-4 w-4 ${
+                            i < course.rating
+                              ? 'text-yellow-400 fill-current'
+                              : 'text-gray-300 dark:text-gray-500'
+                          }`}
+                        />
+                      ))}
+                      <span className="text-xs text-gray-600 dark:text-gray-400 ml-1">
+                        {course.rating}
+                      </span>
+                    </div>
+
+                    {/* Nombre d'étudiants */}
+                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                      👥 {course.students} étudiants
+                    </p>
                   </div>
                 </div>
-                <div className="p-4 text-center">
-                  <div className={`p-3 rounded-full mx-auto mb-4 ${course.iconBgClasses} group-hover:scale-110 transition-transform`}>
-                    {course.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{course.title}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{course.branch}</p>
-                  <div className="flex items-center justify-center mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon key={i} className={`h-4 w-4 ${i < course.rating ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-500'}`} />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{course.students} étudiants</p>
-                </div>
-              </div>
-            </Link>
-          )) : (
-            <p className="col-span-full text-center text-gray-500 dark:text-gray-400">Aucun cours trouvé pour "{searchQuery}".</p>
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                Aucun cours trouvé pour "{searchQuery}"
+              </p>
+            </div>
           )}
         </div>
       </div>
     </section>
   );
 
+  /**
+   * Section des catégories
+   */
   const Categories = () => (
     <section className="py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 animate-fadeInUp">Découvrez Nos Catégories {searchQuery ? `pour "${searchQuery}"` : ''}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {filteredCategories.length > 0 ? filteredCategories.map((cat, index) => (
-            <Link key={index} to="/branches" className="group">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-200 dark:border-gray-600">
-                <div className={`w-12 h-12 ${cat.bgClasses} rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                  {cat.icon}
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
+          📚 Découvrez Nos Catégories
+          {searchQuery && <span className="text-gray-600 dark:text-gray-400 font-normal"> pour "{searchQuery}"</span>}
+        </h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map((cat, index) => (
+              <Link key={index} to="/branches" className="group">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-200 dark:border-gray-600">
+                  <div className={`w-12 h-12 ${cat.bgClasses} rounded-full mx-auto mb-4 flex items-center justify-center text-gray-800 dark:text-gray-200 group-hover:scale-110 transition-transform`}>
+                    {cat.icon}
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    {cat.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    +20 cours
+                  </p>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{cat.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">+20 cours</p>
-              </div>
-            </Link>
-          )) : (
-            <p className="col-span-full text-center text-gray-500 dark:text-gray-400">Aucune catégorie trouvée pour "{searchQuery}".</p>
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                Aucune catégorie trouvée pour "{searchQuery}"
+              </p>
+            </div>
           )}
         </div>
       </div>
     </section>
   );
 
+  /**
+   * Section des témoignages
+   */
   const Testimonials = () => (
     <section className="py-16 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 animate-fadeInUp">Ce Que Disent Nos Étudiants</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
+          💬 Ce Que Disent Nos Étudiants
+        </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-gray-50 dark:bg-gray-700 p-6 rounded-2xl shadow-md">
-              <p className="text-gray-700 dark:text-gray-300 italic mb-4">"{testimonial.quote}"</p>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3">
-                  <span className="text-blue-600 dark:text-blue-400 font-semibold">S.</span>
+            <div
+              key={index}
+              className="bg-gray-50 dark:bg-gray-700 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-600"
+            >
+              <p className="text-gray-700 dark:text-gray-300 italic mb-4 leading-relaxed">
+                "{testimonial.quote}"
+              </p>
+
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-blue-600 dark:text-blue-400 font-bold text-sm">
+                    {testimonial.name.charAt(0)}
+                  </span>
                 </div>
+
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</h4>
-                  <div className="flex">
+                  <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                    {testimonial.name}
+                  </h4>
+                  <div className="flex gap-0.5 mt-1">
                     {[...Array(5)].map((_, i) => (
-                      <StarIcon key={i} className={`h-4 w-4 ${i < testimonial.rating ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-500'}`} />
+                      <StarIcon
+                        key={i}
+                        className={`h-3 w-3 ${
+                          i < testimonial.rating
+                            ? 'text-yellow-400 fill-current'
+                            : 'text-gray-300 dark:text-gray-500'
+                        }`}
+                      />
                     ))}
                   </div>
                 </div>
@@ -158,14 +309,21 @@ function Home({ searchQuery = '' }) {
     </section>
   );
 
+  /**
+   * Section Call-To-Action
+   */
   const CTASection = () => (
-    <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-gray-800 dark:to-gray-700 text-white">
+    <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-gray-900 dark:to-gray-800 text-white">
       <div className="max-w-4xl mx-auto text-center px-4">
-        <h2 className="text-3xl font-bold mb-4">Prêt à Booster Votre Carrière IT ?</h2>
-        <p className="text-xl mb-8 opacity-90">Rejoignez 1M+ étudiants. Cours gratuits, IA intégrée, et progrès suivi – commencez aujourd'hui !</p>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          🚀 Prêt à Booster Votre Carrière IT ?
+        </h2>
+        <p className="text-lg md:text-xl mb-8 opacity-95">
+          Rejoignez 1M+ étudiants. Cours gratuits, IA intégrée, et progrès suivi – commencez aujourd'hui !
+        </p>
         <button
           onClick={() => navigate('/signup')}
-          className="bg-white text-blue-600 dark:bg-gray-200 dark:text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-300 transform hover:scale-105 transition-all duration-300 shadow-lg"
+          className="bg-white text-blue-600 dark:bg-gray-200 dark:text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-300 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
         >
           Commencez à Apprendre
         </button>

@@ -40,7 +40,7 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      axios.get('http://localhost:5000/api/profile', { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/profile`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setUserRole(res.data.user.role))
         .catch(() => {});
     }

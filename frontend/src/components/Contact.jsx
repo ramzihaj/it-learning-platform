@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { 
   EnvelopeIcon, 
   PhoneIcon, 
@@ -9,7 +8,14 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { api } from '@/utils/helpers';
 
+/**
+ * Contact - Formulaire de contact
+ * Permet aux utilisateurs de nous envoyer des messages
+ * @component
+ * @returns {JSX.Element} Page de contact avec formulaire et informations
+ */
 function Contact() {
   const [formData, setFormData] = useState({
     name: '',
@@ -18,9 +24,13 @@ function Contact() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
+  const [submitStatus, setSubmitStatus] = useState(null);
   const [errors, setErrors] = useState({});
 
+  /**
+   * Valide les données du formulaire
+   * @returns {boolean} True si le formulaire est valide
+   */
   const validateForm = () => {
     const newErrors = {};
     
@@ -48,6 +58,9 @@ function Contact() {
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * Traite la soumission du formulaire
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -59,7 +72,11 @@ function Contact() {
     setSubmitStatus(null);
     
     try {
-      const response = await axios.post('http://localhost:5000/api/contact', formData);
+      await fetch(`${api.baseURL}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
       setErrors({});
@@ -71,11 +88,13 @@ function Contact() {
     }
   };
 
+  /**
+   * Met à jour les données du formulaire
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -114,7 +133,7 @@ function Contact() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Contactez-nous
+            💬 Contactez-nous
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Une question ? Un problème ? Notre équipe est là pour vous aider à réussir votre parcours d'apprentissage IT.
@@ -125,15 +144,15 @@ function Contact() {
           {/* Formulaire de Contact */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Envoyez-nous un message
+              ✏️ Envoyez-nous un message
             </h2>
             
-            {/* Status Messages */}
+            {/* Messages de Statut */}
             {submitStatus === 'success' && (
               <div className="mb-6 p-4 bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg flex items-center">
                 <CheckCircleIcon className="h-5 w-5 text-green-600 dark:text-green-400 mr-3" />
                 <p className="text-green-700 dark:text-green-300 font-medium">
-                  Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.
+                  ✅ Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.
                 </p>
               </div>
             )}
@@ -142,7 +161,7 @@ function Contact() {
               <div className="mb-6 p-4 bg-red-100 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg flex items-center">
                 <ExclamationTriangleIcon className="h-5 w-5 text-red-600 dark:text-red-400 mr-3" />
                 <p className="text-red-700 dark:text-red-300 font-medium">
-                  Erreur lors de l'envoi. Veuillez réessayer ou nous contacter directement.
+                  ❌ Erreur lors de l'envoi. Veuillez réessayer ou nous contacter directement.
                 </p>
               </div>
             )}
@@ -164,7 +183,7 @@ function Contact() {
                     placeholder="Votre nom"
                   />
                   {errors.name && (
-                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">❌ {errors.name}</p>
                   )}
                 </div>
                 
@@ -183,7 +202,7 @@ function Contact() {
                     placeholder="votre@email.com"
                   />
                   {errors.email && (
-                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">❌ {errors.email}</p>
                   )}
                 </div>
               </div>
@@ -203,7 +222,7 @@ function Contact() {
                   placeholder="Sujet de votre message"
                 />
                 {errors.subject && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.subject}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">❌ {errors.subject}</p>
                 )}
               </div>
 
@@ -215,29 +234,26 @@ function Contact() {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  rows={6}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition-colors duration-300 resize-none ${
                     errors.message ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
                   }`}
-                  placeholder="Décrivez votre question ou problème en détail..."
+                  rows="5"
+                  placeholder="Détaillez votre message..."
                 />
                 {errors.message && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.message}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">❌ {errors.message}</p>
                 )}
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  {formData.message.length}/500 caractères
-                </p>
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-400 dark:hover:to-purple-400 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-400 dark:hover:to-purple-400 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Envoi en cours...
+                    Envoi...
                   </>
                 ) : (
                   <>
@@ -250,67 +266,30 @@ function Contact() {
           </div>
 
           {/* Informations de Contact */}
-          <div className="space-y-8">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Informations de contact
-              </h2>
-              <div className="space-y-6">
-                {contactInfo.map((info, index) => (
-                  <div key={index} className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                      <div className="text-blue-600 dark:text-blue-400">
-                        {info.icon}
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {info.title}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-300 font-medium">
-                        {info.value}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {info.description}
-                      </p>
-                    </div>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              📍 Nos Informations
+            </h2>
+            {contactInfo.map((info, index) => (
+              <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-start">
+                  <div className="text-blue-600 dark:text-blue-400 mr-4 mt-1">
+                    {info.icon}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* FAQ Rapide */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Questions fréquentes
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    Combien de temps pour une réponse ?
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Nous répondons généralement dans les 24 heures ouvrées.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    Support technique disponible ?
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Oui, notre équipe technique est disponible pour vous aider.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    Cours personnalisés ?
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Nous proposons des formations sur mesure pour les entreprises.
-                  </p>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      {info.title}
+                    </h3>
+                    <p className="text-gray-700 dark:text-gray-300 font-medium mb-1">
+                      {info.value}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      {info.description}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

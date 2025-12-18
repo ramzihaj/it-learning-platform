@@ -37,11 +37,6 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connecté à MongoDB'))
   .catch(err => console.error('Erreur MongoDB:', err));
 
-// Test endpoint
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Serveur MERN fonctionne !' });
-});
-
 app.listen(port, () => {
   console.log(`Serveur démarré sur http://localhost:${port}`);
 });
